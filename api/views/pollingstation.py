@@ -9,13 +9,20 @@ from api.utils import date_default
 import simplejson as json
 from .decorators import jsonp
 
-def get_polling_stations_cursor(commune=None, city=None, name=None, projection=None):
+def get_polling_stations_cursor(year=None, election_type=None, commune=None, city=None, name=None, projection=None):
 	''' Retrieves polling stations.
-	
+	:param year: Year of the election.
+	:param election_type: Type of the election, local or general.
 	:param commune: The name of the commune.
 	:param city: The name of the city.
 	:param projection: The projection to apply on the search result.
 	'''
+	
+	# Figure out the name of collection we want to apply the query on.
+	# Figure out the name of the collection based on url value.
+	collection_name = election_type + 'pollingstations' + str(year)
+	
+	# Build query base on give URL values.
 	query = {}
 	
 	if commune:
@@ -56,7 +63,7 @@ def get_polling_stations_cursor(commune=None, city=None, name=None, projection=N
 	#proj = build_projection(projection)
 	
 	# Run query
-	cursor = mongo.db.pollingstations.find(query)
+	cursor = mongo.db[collection_name].find(query)
 	
 	return cursor
 	
@@ -67,8 +74,6 @@ def get_polling_stations(cursor):
 	'''
 	
 	response = json.loads('{}')
-	response_to_append_to = None
-	
 	response_to_append_to = response['results'] = []
 	
 	for idx, bp in enumerate(cursor):
@@ -78,9 +83,10 @@ def get_polling_stations(cursor):
 
 class PollingStation(Resource):
 	@jsonp
-	def get(self, commune=None, city=None, name=None):
+	def get(self, year=None, election_type=None, commune=None, city=None, name=None):
 		''' A get resquest to retrieve a JSON reponse listing the polling stations.
-
+		:param year: Year of the election.
+		:param election_type: Type of the election, local or general.
 		:param commune: The name of the commune.
 		:param city: The name of the city.
 		'''
@@ -90,7 +96,7 @@ class PollingStation(Resource):
 		
 		args = parser.parse_args()
 		
-		cursor = get_polling_stations_cursor(commune, city, name, args.projection)
+		cursor = get_polling_stations_cursor(year, election_type, commune, city, name, args.projection)
 		response = get_polling_stations(cursor)
 		
 		return json.dumps(response, default=date_default)

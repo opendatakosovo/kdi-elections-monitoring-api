@@ -6,7 +6,7 @@ _basedir = os.path.abspath(os.path.dirname(__file__))
 
 SERVER_PORT=5000
 
-MONGO_URI='mongodb://localhost:27017/generalelections2014'
+MONGO_URI='mongodb://localhost:27017/kdi'
 
 LOG_LEVEL='WARNING'
 LOG_PATH='logs/kdi-elections-monitoring-api.log'

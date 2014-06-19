@@ -59,14 +59,19 @@ def configure_logging(app):
 	app.logger.info('logging to: %s', log_path)
 
 from .views.pollingstation import PollingStation
+from .views.observation import Observation
 
 def register_resources(api):
 	''' Register REST resources.
 	:param api:
 	'''
+	
 	api.add_resource(PollingStation,
-		'/kdi/2014/generalelections/pollingstations',
-		'/kdi/2014/generalelections/pollingstations/<string:commune>',
-		'/kdi/2014/generalelections/pollingstations/<string:commune>/<string:city>',
-		'/kdi/2014/generalelections/pollingstations/<string:commune>/<string:city>/<string:name>/')
+		'/kdi/<int:year>/<string:election_type>/pollingstations',
+		'/kdi/<int:year>/<string:election_type>/pollingstations/<string:commune>',
+		'/kdi/<int:year>/<string:election_type>/pollingstations/<string:commune>/<string:city>',
+		'/kdi/<int:year>/<string:election_type>/pollingstations/<string:commune>/<string:city>/<string:name>/')
+		
+	api.add_resource(Observation,
+		'/kdi/observations/<int:year>/<string:election_type>/<string:election_round>/search') # POST request
 
